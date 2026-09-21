@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="CODE THINK — 7–8 сынып оқушыларының алгоритмдік ойлауын дамыту платформасы">
   <title>CODE THINK | Алгоритмдік ойлау платформасы</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%2308111f%22/><path d=%22M24 18 10 32l14 14M40 18l14 14-14 14M36 12 28 52%22 fill=%22none%22 stroke=%22%2342d5e8%22 stroke-width=%225%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -35,11 +36,12 @@
     <section class="page active" id="home">
       <div class="hero shell">
         <div class="hero-copy">
-          <div class="eyebrow"><span></span> 7–8 сынып · Python</div>
+          <div class="eyebrow"><span></span> Авторлық педагогикалық платформа · 7–8 сынып</div>
           <h1>Кодтан бұрын<br><em>ойлауды</em> үйрен.</h1>
-          <p>Есепті түсінуден бастап, шешімді тексеруге дейінгі алгоритмдік ойлау жолын бір платформада меңгер.</p>
+          <p>Өмірлік жағдаяттарды Python арқылы шешіп, алгоритмдік ойлау мен функционалдық сауаттылықты бес кезеңмен дамыт.</p>
           <div class="hero-actions">
-            <button class="primary" data-go="diagnostic">Диагностиканы бастау <span>→</span></button>
+            <button class="primary open-login" data-login-role="student">Оқушы ретінде кіру <span>→</span></button>
+            <button class="ghost open-login" data-login-role="teacher">Мұғалім кабинеті</button>
             <button class="ghost" data-go="method">5 кезеңді көру</button>
           </div>
           <div class="feature-row">
@@ -67,6 +69,12 @@ steps = [<span class="yellow">"кіріс"</span>, <span class="yellow">"шар�
           <div class="orbit orbit-b">✓</div>
           <div class="orbit orbit-c">{ }</div>
         </div>
+      </div>
+
+      <div class="shell trust-strip">
+        <div class="trust-logo">CT</div>
+        <div><small>АВТОР</small><strong>Аралтай Әли Сайлауұлы</strong><span>Информатика пәні мұғалімі</span></div>
+        <div><small>МЕКТЕП</small><strong>«Н.Бозжанов атындағы ЖОББМ МДШО» КММ</strong><span>Авторлық цифрлық білім беру ортасы</span></div>
       </div>
 
       <div class="shell section-block">
@@ -143,7 +151,7 @@ steps = [<span class="yellow">"кіріс"</span>, <span class="yellow">"шар�
       <div class="method-roadmap">
         <div><b>C</b><span>Түсін</span></div><div><b>OD</b><span>Жоспарла</span></div><div><b>E</b><span>Кодта</span></div><div><b>TH</b><span>Тексер</span></div><div><b>INK</b><span>Түсіндір және қолдан</span></div>
       </div>
-      <article class="author-card"><div class="author-avatar">CT</div><div><span class="kicker">АВТОР</span><h2 id="authorName">Информатика пәні мұғалімі</h2><p>7–8 сынып оқушыларының алгоритмдік ойлауы мен функционалдық сауаттылығын Python тапсырмалары арқылы дамытуға арналған авторлық жоба.</p></div></article>
+      <article class="author-card"><div class="author-avatar">АӘ</div><div><span class="kicker">АВТОР</span><h2 id="authorName">Аралтай Әли Сайлауұлы</h2><p>Информатика пәні мұғалімі · «Н.Бозжанов атындағы ЖОББМ МДШО» КММ</p><div class="author-contacts"><a href="tel:+77772139040">+7 777 213 90 40</a><a href="mailto:ali.araltay99@gmail.com">ali.araltay99@gmail.com</a></div></div></article>
     </section>
 
     <section class="page shell" id="guide">
@@ -174,8 +182,8 @@ steps = [<span class="yellow">"кіріс"</span>, <span class="yellow">"шар�
       <div id="teacherDashboard" class="hidden">
         <div class="dashboard-toolbar"><div><strong id="submissionTotal">0</strong><span>тапсырылған жұмыс</span></div><div class="toolbar-actions"><button class="small-button" id="showAnalytics">Аналитика</button><button class="small-button" id="showResults">Диагностика</button><button class="small-button" id="showTaskResults">Тапсырмалар</button><button class="small-button" id="showStudents">Оқушылар</button><button class="small-button" id="showManagement">Басқару</button><button class="small-button" id="toggleFinalDiagnostic">Қорытындыны ашу</button><button class="small-button" id="exportButton">Excel CSV</button><button class="small-button" id="printReport">PDF</button><button class="small-button" id="teacherExit">Шығу</button></div></div>
         <div id="analyticsPanel"><div id="teacherAnalytics"></div></div>
-        <div id="resultsPanel" class="hidden"><div id="submissionList" class="submission-list"></div></div>
-        <div id="taskResultsPanel" class="hidden"><div id="taskSubmissionList" class="submission-list"></div></div>
+        <div id="resultsPanel" class="hidden"><div class="filter-bar"><input id="diagnosticSearch" placeholder="Оқушыны іздеу..."><select id="diagnosticClassFilter"><option value="">Барлық сынып</option></select><select id="diagnosticStatusFilter"><option value="">Барлық күй</option><option value="submitted">Тексеру керек</option><option value="graded">Бағаланды</option></select><label>Бастапқы күн<input id="diagnosticDateFrom" type="date"></label><label>Соңғы күн<input id="diagnosticDateTo" type="date"></label><select id="bulkDiagnosticScore"><option value="">Ортақ балл...</option><option value="1">Әр тапсырмаға 1</option><option value="2">Әр тапсырмаға 2</option><option value="3">Әр тапсырмаға 3</option></select><input id="bulkDiagnosticComment" placeholder="Таңдалғандарға ортақ пікір"><button class="small-button" id="applyBulkDiagnosticComment">Жаппай сақтау</button></div><div id="submissionList" class="submission-list"></div></div>
+        <div id="taskResultsPanel" class="hidden"><div class="filter-bar"><input id="taskSearch" placeholder="Оқушы немесе тапсырма..."><select id="taskClassFilter"><option value="">Барлық сынып</option></select><select id="taskStatusFilter"><option value="">Барлық күй</option><option value="submitted">Тексеру керек</option><option value="graded">Бағаланды</option></select><label>Бастапқы күн<input id="taskDateFrom" type="date"></label><label>Соңғы күн<input id="taskDateTo" type="date"></label></div><div id="taskSubmissionList" class="submission-list"></div></div>
         <div id="studentsPanel" class="hidden">
           <div class="student-admin-grid">
             <form id="createStudentForm" class="admin-card">
@@ -187,7 +195,7 @@ steps = [<span class="yellow">"кіріс"</span>, <span class="yellow">"шар�
               <button class="primary" type="submit">Аккаунт құру</button><p class="form-error" id="createStudentError"></p>
               <div id="credentialResult" class="credential-result hidden"></div>
             </form>
-            <div class="admin-card"><span class="kicker">АККАУНТТАР</span><h2>Оқушылар тізімі</h2><div id="studentList" class="student-list"></div></div>
+            <div class="admin-card student-directory"><span class="kicker">АККАУНТТАР</span><h2>Оқушылар тізімі</h2><div class="student-filter-bar"><input id="studentSearch" placeholder="Аты немесе логин..."><select id="studentClassFilter"><option value="">Барлық сынып</option></select><select id="studentStateFilter"><option value="">Барлық күй</option><option value="active">Белсенді</option><option value="blocked">Бұғатталған</option></select></div><div class="bulk-student-actions"><label><input type="checkbox" id="selectAllStudents"> Барлығын таңдау</label><select id="bulkStudentClass"><option value="">Сыныпқа ауыстыру...</option></select><button class="small-button" id="bulkMoveStudents">Ауыстыру</button><button class="small-button" id="bulkActivateStudents">Ашу</button><button class="small-button" id="bulkBlockStudents">Бұғаттау</button><button class="small-button" id="bulkResetPasswords">Жаңа парольдер</button></div><div id="studentList" class="student-list"></div></div>
             <section class="admin-card batch-import-card">
               <div><span class="kicker">EXCEL АРҚЫЛЫ ЖАППАЙ ТІРКЕУ</span><h2>Сыныппен бірге оқушы қосу</h2><p class="helper">Шаблонды жүктеп, оқушыларды толтырыңыз. Импорттан кейін логиндер мен уақытша құпиясөздер жазылған Excel файлы автоматты жүктеледі.</p></div>
               <div class="batch-actions"><button class="small-button" type="button" id="downloadStudentTemplate">Excel шаблонын жүктеу</button><label class="file-picker">Толтырылған файлды таңдау<input id="studentExcelFile" type="file" accept=".xlsx,.xls"></label><button class="primary" type="button" id="importStudentsButton">Оқушыларды тіркеу</button></div>
@@ -208,7 +216,7 @@ steps = [<span class="yellow">"кіріс"</span>, <span class="yellow">"шар�
     </section>
   </main>
 
-  <footer><div class="shell"><span>CODE THINK · Педагогикалық идеяның цифрлық прототипі</span><span>7–8 сынып · 2026</span></div></footer>
+  <footer><div class="shell footer-pro"><div><strong>CODE THINK</strong><span>Аралтай Әли Сайлауұлы · Информатика пәні мұғалімі</span></div><div><span>«Н.Бозжанов атындағы ЖОББМ МДШО» КММ</span><a href="tel:+77772139040">+7 777 213 90 40</a><a href="mailto:ali.araltay99@gmail.com">ali.araltay99@gmail.com</a></div><small>© 2026 CODE THINK. Барлық құқық қорғалған.</small></div></footer>
   <div class="login-modal hidden" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
     <div class="login-dialog">
       <button class="modal-close" id="closeLoginModal" type="button" aria-label="Жабу">×</button>
