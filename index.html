@@ -19,16 +19,16 @@
     <button class="menu-button" id="menuButton" aria-label="Мәзірді ашу" aria-expanded="false">☰</button>
     <nav id="mainNav" aria-label="Негізгі мәзір">
       <a href="#home" data-route="home">Басты бет</a>
-      <a href="#diagnostic" data-route="diagnostic">Диагностика</a>
-      <a href="#method" data-route="method">5 кезең</a>
-      <a href="#assignments" data-route="assignments">Тапсырмалар</a>
-      <a href="#progress" data-route="progress">Прогресс</a>
+      <a href="#diagnostic" data-route="diagnostic" data-student-nav>Диагностика</a>
+      <a href="#method" data-route="method" data-student-nav>5 кезең</a>
+      <a href="#assignments" data-route="assignments" data-student-nav>Тапсырмалар</a>
+      <a href="#progress" data-route="progress" data-student-nav>Прогресс</a>
       <a href="#about" data-route="about">Жоба</a>
       <a href="#guide" data-route="guide">Нұсқаулық</a>
       <a href="#demo" data-route="demo">Демо</a>
-      <a href="#teacher" data-route="teacher">Мұғалім</a>
+      <a href="#teacher" data-route="teacher" id="teacherNavLink">Мұғалім</a>
     </nav>
-    <button class="student-chip" id="studentChip" type="button" title="Аккаунттан шығу">Қонақ</button>
+    <button class="student-chip" id="studentChip" type="button" title="Платформаға кіру">Кіру</button>
   </header>
 
   <main>
@@ -92,12 +92,7 @@ steps = [<span class="yellow">"кіріс"</span>, <span class="yellow">"шар�
 
       <div id="profileGate" class="gate-card">
         <div class="gate-copy"><span class="kicker">ОҚУШЫ КАБИНЕТІ</span><h2>Платформаға кіру</h2><p>Мұғалім берген логин мен құпиясөзді енгізіңіз. Сынып пен аты-жөніңіз аккаунттан автоматты анықталады.</p></div>
-        <form id="profileForm" class="profile-form">
-          <label>Логин<input id="studentLogin" required maxlength="60" autocomplete="username" placeholder="Мысалы: 7a-05"></label>
-          <label>Құпиясөз<input id="studentPassword" type="password" required autocomplete="current-password" placeholder="••••••"></label>
-          <button class="primary" type="submit">Кіру <span>→</span></button>
-          <p class="form-error" id="studentLoginError"></p>
-        </form>
+        <button class="primary open-login" type="button" data-login-role="student">Оқушы ретінде кіру <span>→</span></button>
       </div>
 
       <div id="diagnosticWorkspace" class="workspace hidden">
@@ -174,7 +169,7 @@ steps = [<span class="yellow">"кіріс"</span>, <span class="yellow">"шар�
       <div class="page-header"><div><span class="kicker">МҰҒАЛІМ КЕҢІСТІГІ</span><h1>Нәтижелер панелі</h1><p>Осы браузерде тапсырылған диагностикаларды қарап, бағалаңыз.</p></div></div>
       <div id="teacherLogin" class="gate-card compact">
         <div class="gate-copy"><h2>Мұғалім аккаунты</h2><p>Google кестені бастапқы баптау кезінде құрылған мұғалім логині мен құпиясөзін енгізіңіз.</p></div>
-        <form id="pinForm" class="pin-form"><label>Логин<input id="teacherLoginName" required autocomplete="username" placeholder="Мұғалім логині"></label><label>Құпиясөз<input id="teacherPin" type="password" required autocomplete="current-password" placeholder="••••••••"></label><button class="primary">Кіру</button><p class="form-error" id="teacherLoginError"></p></form>
+        <button class="primary open-login" type="button" data-login-role="teacher">Мұғалім ретінде кіру</button>
       </div>
       <div id="teacherDashboard" class="hidden">
         <div class="dashboard-toolbar"><div><strong id="submissionTotal">0</strong><span>тапсырылған жұмыс</span></div><div class="toolbar-actions"><button class="small-button" id="showAnalytics">Аналитика</button><button class="small-button" id="showResults">Диагностика</button><button class="small-button" id="showTaskResults">Тапсырмалар</button><button class="small-button" id="showStudents">Оқушылар</button><button class="small-button" id="showManagement">Басқару</button><button class="small-button" id="toggleFinalDiagnostic">Қорытындыны ашу</button><button class="small-button" id="exportButton">Excel CSV</button><button class="small-button" id="printReport">PDF</button><button class="small-button" id="teacherExit">Шығу</button></div></div>
@@ -214,6 +209,25 @@ steps = [<span class="yellow">"кіріс"</span>, <span class="yellow">"шар�
   </main>
 
   <footer><div class="shell"><span>CODE THINK · Педагогикалық идеяның цифрлық прототипі</span><span>7–8 сынып · 2026</span></div></footer>
+  <div class="login-modal hidden" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
+    <div class="login-dialog">
+      <button class="modal-close" id="closeLoginModal" type="button" aria-label="Жабу">×</button>
+      <span class="kicker">CODE THINK</span>
+      <h2 id="loginModalTitle">Платформаға кіру</h2>
+      <p class="helper">Алдымен өз рөліңізді таңдаңыз.</p>
+      <div class="role-picker" role="group" aria-label="Рөлді таңдау">
+        <button type="button" class="role-option active" data-role-choice="student">Оқушы</button>
+        <button type="button" class="role-option" data-role-choice="teacher">Мұғалім</button>
+      </div>
+      <form id="loginForm" class="login-form">
+        <input id="loginRole" type="hidden" value="student">
+        <label>Логин<input id="loginName" required maxlength="60" autocomplete="username" placeholder="Логин"></label>
+        <label>Құпиясөз<input id="loginPassword" type="password" required autocomplete="current-password" placeholder="••••••••"></label>
+        <button class="primary" type="submit">Кіру <span>→</span></button>
+        <p class="form-error" id="loginError"></p>
+      </form>
+    </div>
+  </div>
   <div class="toast" id="toast" role="status"></div>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>

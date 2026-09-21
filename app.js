@@ -106,13 +106,31 @@ function setBusy(button, busy, text = 'Күте тұрыңыз...') { if (!butto
 function debounce(fn, wait) { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => fn(...args), wait); }; }
 
 function go(route) {
-  const target = document.getElementById(route) ? route : 'home';
+  let target = document.getElementById(route) ? route : 'home';
+  if (target === 'teacher' && state.user?.role === 'student') { toast('Мұғалім бөлімі оқушы аккаунтына қолжетімсіз', true); target = 'home'; }
+  if (['diagnostic','method','assignments','progress'].includes(target) && state.user?.role === 'teacher') target = 'teacher';
   $$('.page').forEach(page => page.classList.toggle('active', page.id === target)); $$('[data-route]').forEach(link => link.classList.toggle('active', link.dataset.route === target));
   $('#mainNav').classList.remove('open'); $('#menuButton').setAttribute('aria-expanded', 'false');
   if (target === 'diagnostic') renderDiagnostic(); if (target === 'method') renderMethod(); if (target === 'assignments') renderAssignments(); if (target === 'progress') renderProgress(); if (target === 'teacher') renderTeacherArea();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-function updateGlobalUI() { $('#studentChip').textContent = state.user ? `${state.user.name} · ${state.user.role === 'teacher' ? 'мұғалім' : state.user.grade + '-сынып'}` : 'Қонақ'; $('#studentChip').title = state.user ? 'Аккаунттан шығу' : 'Кіру үшін Диагностика немесе Мұғалім бөлімін ашыңыз'; }
+function updateGlobalUI() {
+  const role = state.user?.role;
+  $('#studentChip').textContent = state.user ? `${state.user.name} · ${role === 'teacher' ? 'мұғалім' : state.user.grade + '-сынып'}` : 'Кіру';
+  $('#studentChip').title = state.user ? 'Аккаунттан шығу' : 'Платформаға кіру';
+  $('#teacherNavLink').classList.toggle('hidden', role === 'student');
+  $$('[data-student-nav]').forEach(link => link.classList.toggle('hidden', role === 'teacher'));
+}
+
+function openLoginModal(role = 'student') {
+  if (state.user) return;
+  const selected = role === 'teacher' ? 'teacher' : 'student';
+  $('#loginRole').value = selected; $('#loginError').textContent = '';
+  $$('[data-role-choice]').forEach(button => button.classList.toggle('active', button.dataset.roleChoice === selected));
+  $('#loginName').placeholder = selected === 'teacher' ? 'Мұғалім логині' : 'Оқушы логині';
+  $('#loginModal').classList.remove('hidden'); setTimeout(() => $('#loginName').focus(), 0);
+}
+function closeLoginModal() { $('#loginModal').classList.add('hidden'); $('#loginPassword').value = ''; $('#loginError').textContent = ''; }
 
 async function syncStudentData() {
   const data = await api('me'); state.user = data.user; state.myData = data; state.diagnosticProfiles = data.diagnosticProfiles || []; state.finalDiagnosticOpen = Boolean(data.finalDiagnosticOpen);
@@ -226,12 +244,14 @@ function updateTimer() { const sec = state.attempt?.status === 'in_progress' ? s
 function renderMethod() {
   const ready = state.user?.role === 'student'; $('#methodGate').classList.toggle('hidden', ready); $('#methodWorkspace').classList.toggle('hidden', !ready); if (!ready) return;
   const completed = state.methodAnswers.filter(a => a.trim()).length, pct = Math.round(completed / methodSteps.length * 100); $('#methodPercent').textContent = `${pct}%`; $('.completion-ring').style.setProperty('--method-pct', `${pct}%`);
-  $('#stepList').innerHTML = methodSteps.map((s, i) => `<button class="step-button ${i === currentStep ? 'active' : ''} ${state.methodAnswers[i]?.trim() ? 'done' : ''}" data-step="${i}"><span class="step-index">${s.short}</span><span class="step-title">${escapeHtml(s.title)}</span><span class="step-status">${state.methodAnswers[i]?.trim() ? '✓' : '·'}</span></button>`).join('');
+  const unlocked = i => i === 0 || state.methodAnswers.slice(0, i).every(answer => String(answer || '').trim());
+  if (!unlocked(currentStep)) currentStep = Math.max(0, state.methodAnswers.findIndex(answer => !String(answer || '').trim()));
+  $('#stepList').innerHTML = methodSteps.map((s, i) => { const isLocked = !unlocked(i); return `<button class="step-button ${i === currentStep ? 'active' : ''} ${state.methodAnswers[i]?.trim() ? 'done' : ''} ${isLocked ? 'locked' : ''}" data-step="${i}" ${isLocked ? 'disabled' : ''}><span class="step-index">${s.short}</span><span class="step-title">${escapeHtml(s.title)}</span><span class="step-status">${state.methodAnswers[i]?.trim() ? '✓' : isLocked ? '🔒' : '·'}</span></button>`; }).join('');
   $$('[data-step]').forEach(btn => btn.addEventListener('click', async () => { await persistStep(); currentStep = Number(btn.dataset.step); renderMethod(); })); renderStep();
 }
 function renderStep() {
   const step = methodSteps[currentStep]; $('#stepPanel').innerHTML = `<span class="step-badge">КЕЗЕҢ ${currentStep + 1} / ${methodSteps.length} · ${escapeHtml(step.english)}</span><h2>${escapeHtml(step.title)}</h2><p class="helper">${escapeHtml(step.help)}</p><div class="scenario"><strong>${state.user.grade}-сынып тапсырмасы</strong><br>${scenarios[state.user.grade]}</div><label class="field-label">Ойлау жазбасы<textarea id="stepAnswer" placeholder="${escapeHtml(step.placeholder)}">${escapeHtml(state.methodAnswers[currentStep] || '')}</textarea></label><p class="helper">Нұсқау: ${escapeHtml(step.placeholder)}</p><div class="step-actions"><button class="small-button" id="prevStep" ${currentStep === 0 ? 'disabled' : ''}>← Алдыңғы</button><button class="primary" id="nextStep">${currentStep === methodSteps.length - 1 ? 'Сақтау' : 'Сақтау және келесі →'}</button></div>`;
-  $('#stepAnswer').addEventListener('input', debounce(() => persistStep().catch(err => toast(err.message, true)), 800)); $('#prevStep').addEventListener('click', async () => { await persistStep(); currentStep--; renderMethod(); }); $('#nextStep').addEventListener('click', async () => { try { await persistStep(); if (currentStep < methodSteps.length - 1) currentStep++; renderMethod(); toast('Кезең сақталды'); } catch (err) { toast(err.message, true); } });
+  $('#stepAnswer').addEventListener('input', debounce(() => persistStep().catch(err => toast(err.message, true)), 800)); $('#prevStep').addEventListener('click', async () => { await persistStep(); currentStep--; renderMethod(); }); $('#nextStep').addEventListener('click', async () => { try { if (!$('#stepAnswer').value.trim()) throw new Error('Келесі кезеңге өту үшін осы кезеңнің жауабын жазыңыз.'); await persistStep(); if (currentStep < methodSteps.length - 1) currentStep++; renderMethod(); toast('Кезең сақталды'); } catch (err) { toast(err.message, true); } });
 }
 async function persistStep() { const area = $('#stepAnswer'); if (!area || state.user?.role !== 'student') return; state.methodAnswers[currentStep] = area.value; await api('saveMethodStep', { stepIndex: currentStep, answer: area.value }); }
 
@@ -260,23 +280,25 @@ function renderAssignmentDetail() {
   const assignment = currentAssignment(); if (!assignment) { activeAssignmentId = ''; renderAssignments(); return; }
   $('#assignmentList').classList.add('hidden'); $('#assignmentDetail').classList.remove('hidden');
   if (!assignment.attempt) { startAssignmentAttempt(assignment); return; }
-  const attempt = assignment.attempt, step = methodSteps[activeLabStep], code = step.code;
+  const attempt = assignment.attempt;
+  const completedBefore = i => i === 0 || methodSteps.slice(0, i).every(s => (attempt.steps || []).some(x => x.stepCode === s.code && String(x.response || '').trim()));
+  if (!completedBefore(activeLabStep)) activeLabStep = Math.max(0, methodSteps.findIndex((s, i) => !completedBefore(i + 1)));
+  const step = methodSteps[activeLabStep], code = step.code;
   const stepData = (attempt.steps || []).find(s => s.stepCode === code) || {};
   const locked = attempt.status !== 'in_progress';
-  $('#assignmentDetail').innerHTML = `<button class="back-link" id="backAssignments">← Тапсырмаларға қайту</button><div class="lab-layout"><aside class="lab-sidebar"><h3>${escapeHtml(assignment.title)}</h3><div class="lab-tabs">${methodSteps.map((s, i) => { const d = (attempt.steps || []).find(x => x.stepCode === s.code); return `<button class="lab-tab ${i === activeLabStep ? 'active' : ''} ${d?.response ? 'done' : ''}" data-lab-step="${i}"><span class="step-index">${s.short}</span><span>${escapeHtml(s.title)}</span><span>${d?.response ? '✓' : ''}</span></button>`; }).join('')}</div></aside><main class="lab-main"><div class="scenario-box"><strong>Өмірлік жағдаят</strong><br>${escapeHtml(assignment.task.scenario)}</div><span class="step-badge">${escapeHtml(step.english)}</span><h2>${escapeHtml(step.title)}</h2><p class="helper">${escapeHtml(step.help)}</p><label class="field-label">Ойлау жазбасы<textarea id="labStepAnswer" ${locked ? 'disabled' : ''} placeholder="${escapeHtml(step.placeholder)}">${escapeHtml(stepData.response || '')}</textarea></label>${code === 'E' ? codeEditorHtml(attempt, locked) : ''}${stepData.feedback ? `<div class="notice"><span>✓</span><p><strong>${stepData.score}/3.</strong> ${escapeHtml(stepData.feedback)}</p></div>` : ''}${locked ? '' : aiTutorHtml(code)}<div class="step-actions"><button class="small-button" id="labPrev" ${activeLabStep === 0 ? 'disabled' : ''}>← Алдыңғы</button><div><button class="small-button" id="saveLabStep" ${locked ? 'disabled' : ''}>Сақтау</button> <button class="primary" id="labNext">${activeLabStep === methodSteps.length - 1 ? (locked ? 'Тапсырылды' : 'Тапсыру') : 'Келесі →'}</button></div></div></main></div>`;
+  $('#assignmentDetail').innerHTML = `<button class="back-link" id="backAssignments">← Тапсырмаларға қайту</button><div class="lab-layout"><aside class="lab-sidebar"><h3>${escapeHtml(assignment.title)}</h3><div class="lab-tabs">${methodSteps.map((s, i) => { const d = (attempt.steps || []).find(x => x.stepCode === s.code), stepLocked = !completedBefore(i); return `<button class="lab-tab ${i === activeLabStep ? 'active' : ''} ${d?.response ? 'done' : ''} ${stepLocked ? 'locked' : ''}" data-lab-step="${i}" ${stepLocked ? 'disabled' : ''}><span class="step-index">${s.short}</span><span>${escapeHtml(s.title)}</span><span>${d?.response ? '✓' : stepLocked ? '🔒' : ''}</span></button>`; }).join('')}</div></aside><main class="lab-main"><div class="scenario-box"><strong>Өмірлік жағдаят</strong><br>${escapeHtml(assignment.task.scenario)}</div><span class="step-badge">${escapeHtml(step.english)}</span><h2>${escapeHtml(step.title)}</h2><p class="helper">${escapeHtml(step.help)}</p><label class="field-label">Ойлау жазбасы<textarea id="labStepAnswer" ${locked ? 'disabled' : ''} placeholder="${escapeHtml(step.placeholder)}">${escapeHtml(stepData.response || '')}</textarea></label>${code === 'E' ? codeEditorHtml(attempt, locked) : ''}${stepData.feedback ? `<div class="notice"><span>✓</span><p><strong>${stepData.score}/3.</strong> ${escapeHtml(stepData.feedback)}</p></div>` : ''}<div class="step-actions"><button class="small-button" id="labPrev" ${activeLabStep === 0 ? 'disabled' : ''}>← Алдыңғы</button><div><button class="small-button" id="saveLabStep" ${locked ? 'disabled' : ''}>Сақтау</button> <button class="primary" id="labNext">${activeLabStep === methodSteps.length - 1 ? (locked ? 'Тапсырылды' : 'Тапсыру') : 'Келесі →'}</button></div></div></main></div>`;
   $('#backAssignments').addEventListener('click', () => { activeAssignmentId = ''; renderAssignments(); });
   $$('[data-lab-step]').forEach(btn => btn.addEventListener('click', async () => { await saveCurrentLabStep(false); activeLabStep = Number(btn.dataset.labStep); renderAssignmentDetail(); }));
   $('#labPrev').addEventListener('click', async () => { await saveCurrentLabStep(false); activeLabStep--; renderAssignmentDetail(); });
   $('#saveLabStep')?.addEventListener('click', async () => { try { await saveCurrentLabStep(true); } catch (err) { toast(err.message, true); } });
-  $('#labNext').addEventListener('click', async () => { try { if (locked) return; await saveCurrentLabStep(false); if (activeLabStep < methodSteps.length - 1) { activeLabStep++; renderAssignmentDetail(); } else await submitActiveAssignment(); } catch (err) { toast(err.message, true); } });
-  $('#runPython')?.addEventListener('click', runActiveCode); $('#saveCode')?.addEventListener('click', () => saveActiveCode(true)); $('#askTutor')?.addEventListener('click', askTutor);
+  $('#labNext').addEventListener('click', async () => { try { if (locked) return; if (!$('#labStepAnswer').value.trim()) throw new Error('Келесі кезеңге өту үшін осы кезеңнің жауабын жазыңыз.'); await saveCurrentLabStep(false); if (activeLabStep < methodSteps.length - 1) { activeLabStep++; renderAssignmentDetail(); } else await submitActiveAssignment(); } catch (err) { toast(err.message, true); } });
+  $('#runPython')?.addEventListener('click', runActiveCode); $('#saveCode')?.addEventListener('click', () => saveActiveCode(true));
   const editor = $('#pythonCode'); if (editor) editor.addEventListener('keydown', handleTabKey);
 }
 
 function codeEditorHtml(attempt, locked) {
-  return `<div class="field-label">Python редакторы<textarea id="pythonCode" class="code-editor" ${locked ? 'disabled' : ''}>${escapeHtml(attempt.code || '')}</textarea></div><div class="code-controls"><input id="pythonInput" ${locked ? 'disabled' : ''} placeholder="input() мәндерін әр жолға жазыңыз" value="${escapeHtml(attempt.inputData || '')}"><button class="small-button" id="saveCode" ${locked ? 'disabled' : ''}>Кодты сақтау</button><button class="primary" id="runPython" ${locked ? 'disabled' : ''}>▶ Орындау</button></div><pre class="code-output" id="pythonOutput">${escapeHtml(attempt.output || 'Нәтиже осы жерде көрсетіледі.')}</pre>`;
+  return `<div class="field-label">Python редакторы<textarea id="pythonCode" class="code-editor" ${locked ? 'disabled' : ''}>${escapeHtml(attempt.code || '')}</textarea></div><div class="code-controls"><textarea id="pythonInput" class="python-input" ${locked ? 'disabled' : ''} placeholder="input() мәндерін әр жолға жазыңыз">${escapeHtml(attempt.inputData || '')}</textarea><button class="small-button" id="saveCode" ${locked ? 'disabled' : ''}>Кодты сақтау</button><button class="primary" id="runPython" ${locked ? 'disabled' : ''}>▶ Орындау</button></div><pre class="code-output" id="pythonOutput">${escapeHtml(attempt.output || 'Нәтиже осы жерде көрсетіледі.')}</pre>`;
 }
-function aiTutorHtml(code) { return `<div class="tutor-box"><h3>AI Tutor</h3><p class="helper">AI дайын жауап бермейді, осы қадамды орындауға бағыттайды.</p><div id="tutorAnswer" class="tutor-answer"></div><div class="tutor-controls"><input id="tutorQuestion" placeholder="Қай жерін түсінбей тұрсыз?"><select id="hintLevel"><option value="1">1 — сұрақ</option><option value="2">2 — еске түсіру</option><option value="3">3 — ишара</option><option value="4">4 — шағын үлгі</option></select><button class="small-button" id="askTutor" data-step-code="${code}">Көмек сұрау</button></div></div>`; }
 
 async function saveCurrentLabStep(showToast) {
   const assignment = currentAssignment(), area = $('#labStepAnswer'); if (!assignment || !area || assignment.attempt.status !== 'in_progress') return;
@@ -305,11 +327,6 @@ async function runActiveCode(event) {
   const button = event.currentTarget, output = $('#pythonOutput');
   try { setBusy(button, true, 'Орындалуда...'); output.textContent = 'Python жүктелуде...'; const result = await executePython($('#pythonCode').value, $('#pythonInput').value); output.textContent = result.output; await saveActiveCode(false); }
   catch (err) { output.textContent = err.message; } finally { setBusy(button, false); }
-}
-async function askTutor(event) {
-  const button = event.currentTarget, question = $('#tutorQuestion').value.trim(); if (!question) return toast('Алдымен сұрақ жазыңыз', true);
-  try { setBusy(button, true, 'Ойланып жатыр...'); const result = await api('aiTutor', { attemptId: currentAssignment().attempt.id, stepCode: button.dataset.stepCode, hintLevel: Number($('#hintLevel').value), question }); $('#tutorAnswer').textContent = result.answer; toast(`Қалған сұрау: ${result.remaining}`); }
-  catch (err) { $('#tutorAnswer').textContent = err.message; } finally { setBusy(button, false); }
 }
 async function submitActiveAssignment() {
   const assignment = currentAssignment(); const done = methodSteps.filter(step => (assignment.attempt.steps || []).some(s => s.stepCode === step.code && String(s.response || '').trim())).length;
@@ -483,15 +500,21 @@ async function toggleFullscreen() { try { if (!document.fullscreenElement) await
 
 document.addEventListener('click', event => { const goButton = event.target.closest('[data-go]'); if (goButton) location.hash = goButton.dataset.go; }); window.addEventListener('hashchange', () => go(location.hash.slice(1)));
 $('#menuButton').addEventListener('click', () => { const open = $('#mainNav').classList.toggle('open'); $('#menuButton').setAttribute('aria-expanded', String(open)); });
-$('#profileForm').addEventListener('submit', async event => {
-  event.preventDefault(); const button = $('button', event.currentTarget); $('#studentLoginError').textContent = '';
-  try { setBusy(button, true, 'Кіру...'); const data = await api('login', { login: $('#studentLogin').value, password: $('#studentPassword').value }); if (data.user.role !== 'student') throw new Error('Оқушы аккаунтымен кіріңіз.'); setSession(data); await changeTemporaryPasswordIfNeeded(); await syncStudentData(); state.workspace = await api('studentWorkspace'); await renderDiagnostic(); toast('Қош келдіңіз!'); }
-  catch (err) { $('#studentLoginError').textContent = err.message; } finally { setBusy(button, false); }
-});
-$('#pinForm').addEventListener('submit', async event => {
-  event.preventDefault(); const button = $('button', event.currentTarget); $('#teacherLoginError').textContent = '';
-  try { setBusy(button, true, 'Кіру...'); const data = await api('login', { login: $('#teacherLoginName').value, password: $('#teacherPin').value }); if (data.user.role !== 'teacher') throw new Error('Мұғалім аккаунтымен кіріңіз.'); setSession(data); await renderTeacherArea(); toast('Мұғалім панелі ашылды'); }
-  catch (err) { $('#teacherLoginError').textContent = err.message; } finally { setBusy(button, false); }
+$$('.open-login').forEach(button => button.addEventListener('click', () => openLoginModal(button.dataset.loginRole)));
+$$('[data-role-choice]').forEach(button => button.addEventListener('click', () => openLoginModal(button.dataset.roleChoice)));
+$('#closeLoginModal').addEventListener('click', closeLoginModal);
+$('#loginModal').addEventListener('click', event => { if (event.target === $('#loginModal')) closeLoginModal(); });
+document.addEventListener('keydown', event => { if (event.key === 'Escape' && !$('#loginModal').classList.contains('hidden')) closeLoginModal(); });
+$('#loginForm').addEventListener('submit', async event => {
+  event.preventDefault(); const button = $('button[type="submit"]', event.currentTarget), role = $('#loginRole').value; $('#loginError').textContent = '';
+  try {
+    setBusy(button, true, 'Кіру...');
+    const data = await api('login', { login: $('#loginName').value, password: $('#loginPassword').value });
+    if (data.user.role !== role) throw new Error(role === 'teacher' ? 'Мұғалім аккаунтымен кіріңіз.' : 'Оқушы аккаунтымен кіріңіз.');
+    setSession(data); closeLoginModal();
+    if (role === 'student') { await changeTemporaryPasswordIfNeeded(); await syncStudentData(); state.workspace = await api('studentWorkspace'); go('assignments'); toast('Оқушы кабинетіне қош келдіңіз!'); }
+    else { await renderTeacherArea(); go('teacher'); toast('Мұғалім панелі ашылды'); }
+  } catch (err) { $('#loginError').textContent = err.message; } finally { setBusy(button, false); }
 });
 $('#createStudentForm').addEventListener('submit', async event => {
   event.preventDefault(); const form = event.currentTarget; const button = $('button', form); $('#createStudentError').textContent = '';
@@ -506,7 +529,7 @@ $('#toggleFinalDiagnostic').addEventListener('click', async () => { const button
 $('#createClassForm').addEventListener('submit', async event => { event.preventDefault(); const form = event.currentTarget; const button = $('button', form); try { setBusy(button, true, 'Құрылуда...'); await api('createClass', { name: $('#newClassName').value, grade: $('#newClassGrade').value }); form.reset(); await refreshTeacherWorkspace(); toast('Сынып құрылды'); } catch (err) { toast(err.message, true); } finally { setBusy(button, false); } });
 $('#createTaskForm').addEventListener('submit', async event => { event.preventDefault(); const form = event.currentTarget; const button = $('button', form); try { setBusy(button, true, 'Қосылуда...'); await api('createTask', { title: $('#newTaskTitle').value, grade: $('#newTaskGrade').value, topic: $('#newTaskTopic').value, scenario: $('#newTaskScenario').value, starterCode: $('#newTaskCode').value, difficulty: 'орта', testCases: [] }); form.reset(); await refreshTeacherWorkspace(); toast('Тапсырма банкке қосылды'); } catch (err) { toast(err.message, true); } finally { setBusy(button, false); } });
 $('#createAssignmentForm').addEventListener('submit', async event => { event.preventDefault(); const form = event.currentTarget; const button = $('button', form); try { setBusy(button, true, 'Жариялануда...'); await api('createAssignment', { classId: $('#assignmentClass').value, taskId: $('#assignmentTask').value, dueAt: $('#assignmentDue').value }); form.reset(); await refreshTeacherWorkspace(); toast('Тапсырма сыныпқа берілді'); } catch (err) { toast(err.message, true); } finally { setBusy(button, false); } });
-$('#teacherExit').addEventListener('click', async () => { await clearSession(); renderTeacherArea(); }); $('#studentChip').addEventListener('click', async () => { if (!state.user) return; if (confirm('Аккаунттан шығасыз ба?')) { await clearSession(); go('home'); } });
+$('#teacherExit').addEventListener('click', async () => { await clearSession(); renderTeacherArea(); go('home'); }); $('#studentChip').addEventListener('click', async () => { if (!state.user) return openLoginModal('student'); if (confirm('Аккаунттан шығасыз ба?')) { await clearSession(); go('home'); } });
 document.addEventListener('visibilitychange', () => { if (document.hidden && state.user?.role === 'student' && state.attempt?.status === 'in_progress' && $('#diagnostic').classList.contains('active')) { state.switches++; api('recordEvent', { attemptId: state.attempt.id, type: 'visibility_hidden', value: state.switches }).catch(() => {}); } });
 document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && state.attempt?.status === 'in_progress') api('recordEvent', { attemptId: state.attempt.id, type: 'fullscreen_exit' }).catch(() => {}); });
 $('#diagnosticWorkspace').addEventListener('copy', event => { event.preventDefault(); toast('Диагностика кезінде көшіру өшірілген', true); if (state.attempt) api('recordEvent', { attemptId: state.attempt.id, type: 'copy_attempt' }).catch(() => {}); }); $('#diagnosticWorkspace').addEventListener('cut', event => event.preventDefault()); $('#diagnosticWorkspace').addEventListener('contextmenu', event => event.preventDefault());
