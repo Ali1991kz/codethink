@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CODE THINK — 7–8 сынып оқушыларының алгоритмдік ойлауын дамыту платформасы">
+  <title>CODE THINK | Алгоритмдік ойлау платформасы</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#home" data-route="home" aria-label="CODE THINK басты беті">
+      <span class="brand-mark">&lt;/&gt;</span>
+      <span><strong>CODE THINK</strong><small>ойла · құр · тексер</small></span>
+    </a>
+    <button class="menu-button" id="menuButton" aria-label="Мәзірді ашу" aria-expanded="false">☰</button>
+    <nav id="mainNav" aria-label="Негізгі мәзір">
+      <a href="#home" data-route="home">Басты бет</a>
+      <a href="#diagnostic" data-route="diagnostic">Диагностика</a>
+      <a href="#method" data-route="method">5 кезең</a>
+      <a href="#assignments" data-route="assignments">Тапсырмалар</a>
+      <a href="#progress" data-route="progress">Прогресс</a>
+      <a href="#about" data-route="about">Жоба</a>
+      <a href="#guide" data-route="guide">Нұсқаулық</a>
+      <a href="#demo" data-route="demo">Демо</a>
+      <a href="#teacher" data-route="teacher">Мұғалім</a>
+    </nav>
+    <button class="student-chip" id="studentChip" type="button" title="Аккаунттан шығу">Қонақ</button>
+  </header>
+
+  <main>
+    <section class="page active" id="home">
+      <div class="hero shell">
+        <div class="hero-copy">
+          <div class="eyebrow"><span></span> 7–8 сынып · Python</div>
+          <h1>Кодтан бұрын<br><em>ойлауды</em> үйрен.</h1>
+          <p>Есепті түсінуден бастап, шешімді тексеруге дейінгі алгоритмдік ойлау жолын бір платформада меңгер.</p>
+          <div class="hero-actions">
+            <button class="primary" data-go="diagnostic">Диагностиканы бастау <span>→</span></button>
+            <button class="ghost" data-go="method">5 кезеңді көру</button>
+          </div>
+          <div class="feature-row">
+            <div><strong>7</strong><span>диагностикалық тапсырма</span></div>
+            <div><strong>5</strong><span>ойлау кезеңі</span></div>
+            <div><strong>40</strong><span>минут</span></div>
+          </div>
+        </div>
+        <div class="hero-visual" aria-label="CODE THINK әдісінің көрінісі">
+          <div class="code-window">
+            <div class="window-bar"><i></i><i></i><i></i><span>thinking.py</span></div>
+            <pre><code><span class="muted"># 1. Мәселені түсін</span>
+problem = <span class="yellow">"Нені шешемін?"</span>
+
+<span class="muted"># 2. Жоспар құр</span>
+steps = [<span class="yellow">"кіріс"</span>, <span class="yellow">"шарт"</span>, <span class="yellow">"нәтиже"</span>]
+
+<span class="purple">for</span> step <span class="purple">in</span> steps:
+    think(step)
+    test(step)
+
+<span class="green">print</span>(<span class="yellow">"Шешім дайын!"</span>)</code></pre>
+          </div>
+          <div class="orbit orbit-a">?</div>
+          <div class="orbit orbit-b">✓</div>
+          <div class="orbit orbit-c">{ }</div>
+        </div>
+      </div>
+
+      <div class="shell section-block">
+        <div class="section-heading">
+          <div><span class="kicker">ҚАЛАЙ ЖҰМЫС ІСТЕЙДІ?</span><h2>Үш кезең — бір нәтиже</h2></div>
+          <p>Алдымен қазіргі деңгей анықталады, кейін бес кезең бойынша жаттығу орындалады, соңында прогресс көрінеді.</p>
+        </div>
+        <div class="cards three">
+          <article class="info-card"><span class="card-number">01</span><div class="icon">◎</div><h3>Диагностика</h3><p>Алгоритм құру, кодты талдау және қатені түзету дағдылары анықталады.</p></article>
+          <article class="info-card featured"><span class="card-number">02</span><div class="icon">⌘</div><h3>CODE THINK әдісі</h3><p>Мәселе бес кезеңмен талданып, шешім біртіндеп құрылады.</p></article>
+          <article class="info-card"><span class="card-number">03</span><div class="icon">↗</div><h3>Прогресс</h3><p>Орындалған қадамдар, нәтиже және мұғалім бағасы бір жерде сақталады.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="page shell" id="diagnostic">
+      <div class="page-header">
+        <div><span class="kicker" id="diagnosticKicker">БАСТАПҚЫ ДЕҢГЕЙ</span><h1 id="diagnosticTitle">Диагностика</h1><p>7 тапсырма · ұсынылатын уақыт — 40 минут · ең жоғары балл — 21</p></div>
+        <div class="timer" id="timer"><small>Қалған уақыт</small><strong>40:00</strong></div>
+      </div>
+
+      <div class="notice"><span>i</span><p><strong>Академиялық адалдық.</strong> Жауаптар Google кестеге автоматты сақталады. Скриншотқа толық техникалық тыйым салу мүмкін емес; платформа көшіруді шектеп, беттен ауысу әрекетін тіркейді.</p></div>
+
+      <div id="profileGate" class="gate-card">
+        <div class="gate-copy"><span class="kicker">ОҚУШЫ КАБИНЕТІ</span><h2>Платформаға кіру</h2><p>Мұғалім берген логин мен құпиясөзді енгізіңіз. Сынып пен аты-жөніңіз аккаунттан автоматты анықталады.</p></div>
+        <form id="profileForm" class="profile-form">
+          <label>Логин<input id="studentLogin" required maxlength="60" autocomplete="username" placeholder="Мысалы: 7a-05"></label>
+          <label>Құпиясөз<input id="studentPassword" type="password" required autocomplete="current-password" placeholder="••••••"></label>
+          <button class="primary" type="submit">Кіру <span>→</span></button>
+          <p class="form-error" id="studentLoginError"></p>
+        </form>
+      </div>
+
+      <div id="diagnosticWorkspace" class="workspace hidden">
+        <aside class="task-sidebar">
+          <div class="side-title">Тапсырмалар <span id="answeredCount">0/7</span></div>
+          <div class="task-dots" id="taskDots"></div>
+          <div class="integrity-box"><small>Беттен ауысу</small><strong id="switchCount">0 рет</strong></div>
+          <button class="small-button" id="fullscreenButton" type="button">Толық экранға өту</button>
+        </aside>
+        <article class="task-panel" id="taskPanel"></article>
+      </div>
+    </section>
+
+    <section class="page shell" id="method">
+      <div class="page-header method-heading">
+        <div><span class="kicker">АВТОРЛЫҚ ӘДІС</span><h1>CODE THINK — 5 кезең</h1><p>Түсін, жоспарла, кодта, тексер, түсіндір және қолдан.</p></div>
+        <div class="completion-ring"><strong id="methodPercent">0%</strong><span>орындалды</span></div>
+      </div>
+      <div id="methodGate" class="notice"><span>!</span><p>Жаттығуды бастау үшін алдымен «Диагностика» бөлімінде оқушы профилін ашыңыз.</p></div>
+      <div id="methodWorkspace" class="method-layout hidden">
+        <aside class="step-list" id="stepList"></aside>
+        <article class="step-panel" id="stepPanel"></article>
+      </div>
+    </section>
+
+    <section class="page shell" id="progress">
+      <div class="page-header"><div><span class="kicker">ЖЕКЕ НӘТИЖЕ</span><h1>Менің прогресім</h1><p>Диагностика мен бес кезең бойынша орындалу жағдайы.</p></div></div>
+      <div id="progressEmpty" class="empty-state"><div>↗</div><h2>Әзірге нәтиже жоқ</h2><p>Оқушы профилін ашып, диагностиканы немесе CODE THINK жаттығуын бастаңыз.</p><button class="primary" data-go="diagnostic">Бастау</button></div>
+      <div id="progressContent" class="hidden"></div>
+    </section>
+
+    <section class="page shell" id="assignments">
+      <div class="page-header"><div><span class="kicker">CODE → THINK ЗЕРТХАНАСЫ</span><h1>Менің тапсырмаларым</h1><p>Өмірлік жағдаятты бес кезеңмен талдап, Python кодын орындаңыз.</p></div></div>
+      <div id="assignmentLoginNotice" class="empty-state"><div>⌘</div><h2>Оқушы аккаунты қажет</h2><p>Тапсырмаларды көру үшін Диагностика бөлімінде login/password арқылы кіріңіз.</p><button class="primary" data-go="diagnostic">Кіру</button></div>
+      <div id="assignmentWorkspace" class="hidden">
+        <div id="assignmentList" class="assignment-grid"></div>
+        <div id="assignmentDetail" class="hidden"></div>
+      </div>
+    </section>
+
+    <section class="page shell" id="about">
+      <div class="page-header"><div><span class="kicker">АВТОРЛЫҚ ПЕДАГОГИКАЛЫҚ ИДЕЯ</span><h1>CODE THINK туралы</h1><p>Алдымен ойла. Содан кейін кодта.</p></div></div>
+      <div class="about-grid">
+        <article class="story-card"><span class="kicker">МӘСЕЛЕ</span><h2>Дайын код ойлауды дамытпайды</h2><p>Оқушы синтаксисті қайталағанымен, шарт өзгергенде шешім құра алмауы мүмкін. Платформа кодтың нәтижесін ғана емес, оған апаратын ойлау жолын да көрсетеді.</p></article>
+        <article class="story-card"><span class="kicker">ШЕШІМ</span><h2>Бес кезеңдік оқу циклі</h2><p>Түсін → Жоспарла → Кодта → Тексер → Түсіндір және қолдан. Әр кезеңдегі жауап сақталып, мұғалімге оқушының нақты қай дағдысында қолдау қажет екенін көрсетеді.</p></article>
+        <article class="story-card"><span class="kicker">НЕГІЗ</span><h2>Авторлық әдістемелік құрал</h2><p>Жоба 2025 жылғы «Оқушылардың логикалық ойлауын жетілдіруге бағытталған Python есептері» әдістемелік құралының интерактивті цифрлық жалғасы.</p></article>
+      </div>
+      <div class="method-roadmap">
+        <div><b>C</b><span>Түсін</span></div><div><b>OD</b><span>Жоспарла</span></div><div><b>E</b><span>Кодта</span></div><div><b>TH</b><span>Тексер</span></div><div><b>INK</b><span>Түсіндір және қолдан</span></div>
+      </div>
+      <article class="author-card"><div class="author-avatar">CT</div><div><span class="kicker">АВТОР</span><h2 id="authorName">Информатика пәні мұғалімі</h2><p>7–8 сынып оқушыларының алгоритмдік ойлауы мен функционалдық сауаттылығын Python тапсырмалары арқылы дамытуға арналған авторлық жоба.</p></div></article>
+    </section>
+
+    <section class="page shell" id="guide">
+      <div class="page-header"><div><span class="kicker">ҚОЛДАНУ НҰСҚАУЛЫҒЫ</span><h1>Платформамен жұмыс</h1><p>Мұғалім мен оқушыға арналған қысқа әрі нақты қадамдар.</p></div></div>
+      <div class="guide-grid">
+        <article class="guide-card"><span>Мұғалім</span><ol><li>Мұғалім кабинетіне кіріңіз.</li><li>Сынып пен оқушы аккаунттарын құрыңыз.</li><li>Уақытша логин мен құпиясөзді оқушыға беріңіз.</li><li>Бастапқы диагностиканы 0–3 баллмен бағалаңыз.</li><li>Тапсырма беріп, прогресті бақылаңыз.</li><li>Оқу циклі соңында қорытынды диагностиканы ашыңыз.</li></ol></article>
+        <article class="guide-card"><span>Оқушы</span><ol><li>Мұғалім берген аккаунтпен кіріңіз.</li><li>Уақытша құпиясөзді жеке құпиясөзге ауыстырыңыз.</li><li>Бастапқы диагностиканы өз бетіңізше орындаңыз.</li><li>CODE THINK кезеңдерімен тапсырмаларды шешіңіз.</li><li>Жеке кабинеттен пікір мен прогресті қараңыз.</li><li>Қорытынды диагностиканы орындаңыз.</li></ol></article>
+      </div>
+      <div class="notice"><span>i</span><p><strong>Қауіпсіздік:</strong> мұғалім оқушының жеке құпиясөзін көрмейді. Ұмытылған жағдайда жаңа уақытша құпиясөз жасайды.</p></div>
+    </section>
+
+    <section class="page shell" id="demo">
+      <div class="page-header"><div><span class="kicker">ҚАЗЫЛАРҒА АРНАЛҒАН КӨРІНІС</span><h1>Демо режим</h1><p>Нақты оқушы деректерін ашпай, платформаның жұмыс логикасын көрсетеді.</p></div></div>
+      <div class="demo-profile">
+        <div class="profile-identity"><div class="profile-avatar">А</div><div><small>ДЕМО ОҚУШЫ</small><h2>Али · 7А сынып</h2><p>Оқу циклі: 6 апта</p></div></div>
+        <div class="demo-scores"><div><small>Бастапқы</small><strong>10/21</strong></div><div><small>Қорытынды</small><strong>17/21</strong></div><div><small>Өсім</small><strong class="positive">+7</strong></div></div>
+      </div>
+      <div class="comparison-chart" id="demoChart"></div>
+      <div class="cards three"><article class="info-card"><div class="icon">✓</div><h3>Күшті жағы</h3><p>Кодтау және мәселені түсіну.</p></article><article class="info-card"><div class="icon">↗</div><h3>Өскен дағды</h3><p>Debugging: 1 балдан 3 балға дейін.</p></article><article class="info-card"><div class="icon">→</div><h3>Келесі қадам</h3><p>Шешімді жаңа жағдаятқа қолдану тапсырмалары.</p></article></div>
+    </section>
+
+    <section class="page shell" id="teacher">
+      <div class="page-header"><div><span class="kicker">МҰҒАЛІМ КЕҢІСТІГІ</span><h1>Нәтижелер панелі</h1><p>Осы браузерде тапсырылған диагностикаларды қарап, бағалаңыз.</p></div></div>
+      <div id="teacherLogin" class="gate-card compact">
+        <div class="gate-copy"><h2>Мұғалім аккаунты</h2><p>Google кестені бастапқы баптау кезінде құрылған мұғалім логині мен құпиясөзін енгізіңіз.</p></div>
+        <form id="pinForm" class="pin-form"><label>Логин<input id="teacherLoginName" required autocomplete="username" placeholder="Мұғалім логині"></label><label>Құпиясөз<input id="teacherPin" type="password" required autocomplete="current-password" placeholder="••••••••"></label><button class="primary">Кіру</button><p class="form-error" id="teacherLoginError"></p></form>
+      </div>
+      <div id="teacherDashboard" class="hidden">
+        <div class="dashboard-toolbar"><div><strong id="submissionTotal">0</strong><span>тапсырылған жұмыс</span></div><div class="toolbar-actions"><button class="small-button" id="showAnalytics">Аналитика</button><button class="small-button" id="showResults">Диагностика</button><button class="small-button" id="showTaskResults">Тапсырмалар</button><button class="small-button" id="showStudents">Оқушылар</button><button class="small-button" id="showManagement">Басқару</button><button class="small-button" id="toggleFinalDiagnostic">Қорытындыны ашу</button><button class="small-button" id="exportButton">Excel CSV</button><button class="small-button" id="printReport">PDF</button><button class="small-button" id="teacherExit">Шығу</button></div></div>
+        <div id="analyticsPanel"><div id="teacherAnalytics"></div></div>
+        <div id="resultsPanel" class="hidden"><div id="submissionList" class="submission-list"></div></div>
+        <div id="taskResultsPanel" class="hidden"><div id="taskSubmissionList" class="submission-list"></div></div>
+        <div id="studentsPanel" class="hidden">
+          <div class="student-admin-grid">
+            <form id="createStudentForm" class="admin-card">
+              <span class="kicker">ЖАҢА АККАУНТ</span><h2>Оқушы қосу</h2>
+              <label>Аты-жөні<input id="newStudentName" required></label>
+              <label>Логин<input id="newStudentLogin" required placeholder="7a-05"></label>
+              <div class="form-row"><label>Сынып<select id="newStudentGrade" required><option value="7">7-сынып</option><option value="8">8-сынып</option></select></label><label>Литера<input id="newStudentClass" placeholder="7А"></label></div>
+              <label>Уақытша құпиясөз<input id="newStudentPassword" minlength="6" placeholder="Бос қалса, автоматты жасалады"></label>
+              <button class="primary" type="submit">Аккаунт құру</button><p class="form-error" id="createStudentError"></p>
+              <div id="credentialResult" class="credential-result hidden"></div>
+            </form>
+            <div class="admin-card"><span class="kicker">АККАУНТТАР</span><h2>Оқушылар тізімі</h2><div id="studentList" class="student-list"></div></div>
+            <section class="admin-card batch-import-card">
+              <div><span class="kicker">EXCEL АРҚЫЛЫ ЖАППАЙ ТІРКЕУ</span><h2>Сыныппен бірге оқушы қосу</h2><p class="helper">Шаблонды жүктеп, оқушыларды толтырыңыз. Импорттан кейін логиндер мен уақытша құпиясөздер жазылған Excel файлы автоматты жүктеледі.</p></div>
+              <div class="batch-actions"><button class="small-button" type="button" id="downloadStudentTemplate">Excel шаблонын жүктеу</button><label class="file-picker">Толтырылған файлды таңдау<input id="studentExcelFile" type="file" accept=".xlsx,.xls"></label><button class="primary" type="button" id="importStudentsButton">Оқушыларды тіркеу</button></div>
+              <div id="batchImportResult" class="batch-result hidden"></div>
+            </section>
+          </div>
+        </div>
+        <div id="managementPanel" class="hidden">
+          <div class="management-grid">
+            <form id="createClassForm" class="admin-card"><span class="kicker">СЫНЫП</span><h2>Жаңа сынып</h2><label>Сынып атауы<input id="newClassName" required placeholder="7А"></label><label>Деңгей<select id="newClassGrade"><option value="7">7-сынып</option><option value="8">8-сынып</option></select></label><button class="primary">Сынып құру</button></form>
+            <form id="createTaskForm" class="admin-card"><span class="kicker">ТАПСЫРМАЛАР БАНКІ</span><h2>Жаңа тапсырма</h2><label>Атауы<input id="newTaskTitle" required></label><div class="form-row"><label>Сынып<select id="newTaskGrade"><option value="7">7-сынып</option><option value="8">8-сынып</option></select></label><label>Тақырып<input id="newTaskTopic" placeholder="Циклдер"></label></div><label>Өмірлік жағдаят<textarea id="newTaskScenario" required></textarea></label><label>Бастапқы код<textarea id="newTaskCode" class="mini-code"></textarea></label><button class="primary">Тапсырма қосу</button></form>
+            <form id="createAssignmentForm" class="admin-card"><span class="kicker">ҚОСЫМША · МІНДЕТТІ ЕМЕС</span><h2>Тапсырма мерзімін белгілеу</h2><p class="helper">Негізгі тапсырмалар сыныпқа автоматты ашылады. Бұл бөлімді тек жеке тапсырмаға мерзім қою қажет болғанда пайдаланыңыз.</p><label>Сынып<select id="assignmentClass"></select></label><label>Тапсырма<select id="assignmentTask"></select></label><label>Мерзімі<input id="assignmentDue" type="datetime-local"></label><button class="primary">Қосымша жариялау</button></form>
+          </div>
+          <div class="admin-card management-list"><h2>Сыныптар мен тіркелім</h2><div id="classList"></div></div>
+          <div class="admin-card management-list"><div class="task-bank-heading"><div><span class="kicker">ӘДІСТЕМЕЛІК ҚҰРАЛ</span><h2>Тапсырмалар банкі</h2></div><strong id="taskBankCount">0 есеп</strong></div><div id="taskBankList" class="task-bank-list"></div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="shell"><span>CODE THINK · Педагогикалық идеяның цифрлық прототипі</span><span>7–8 сынып · 2026</span></div></footer>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
