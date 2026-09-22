@@ -119,7 +119,6 @@ function updateGlobalUI() {
   const role = state.user?.role;
   $('#studentChip').textContent = state.user ? `${state.user.name} · ${role === 'teacher' ? 'мұғалім' : state.user.grade + '-сынып'}` : 'Кіру';
   $('#studentChip').title = state.user ? 'Аккаунттан шығу' : 'Платформаға кіру';
-  $('#teacherNavLink').classList.toggle('hidden', role === 'student');
   $$('[data-student-nav]').forEach(link => link.classList.toggle('hidden', role === 'teacher'));
 }
 
@@ -421,7 +420,6 @@ function renderTeacherAnalytics() {
   const weak = Object.keys(skillLabels).sort((a,b)=>skillAverages[a]-skillAverages[b])[0];
   const classRows=[...new Set(users.map(u=>u.className||`${u.grade}-сынып`))].sort((a,b)=>a.localeCompare(b,'kk')).map(name=>{ const own=users.filter(u=>(u.className||`${u.grade}-сынып`)===name), ids=new Set(own.map(u=>u.id)), done=graded.filter(a=>ids.has(a.userId)); return `<tr><td>${escapeHtml(name)}</td><td>${own.length}</td><td>${own.filter(u=>u.lastLoginAt).length}</td><td>${done.length}</td><td>${avg(done)}</td></tr>`; }).join('');
   $('#teacherAnalytics').innerHTML = `<div class="analytics-cards"><article><small>Барлық оқушы</small><strong>${users.length}</strong></article><article><small>Әлі кірмеген</small><strong>${neverLogged}</strong></article><article><small>Жұмысты бастаған</small><strong>${started}</strong></article><article><small>Нәтижесі бар</small><strong>${completed}</strong></article><article><small>Бастапқы орташа</small><strong>${avg(baseline)}/21</strong></article><article><small>Қорытынды орташа</small><strong>${avg(finals)}/21</strong></article><article><small>Диагностика тексеру</small><strong>${attempts.filter(a=>a.status==='submitted').length}</strong></article><article><small>Тапсырма тексеру</small><strong>${taskAttempts.filter(a=>a.status==='submitted').length}</strong></article></div><div class="dashboard-section"><div class="section-mini-heading"><div><span class="kicker">СЫНЫПТАР</span><h2>Орындалу жағдайы</h2></div><p>Кім кірді, кім бастады және қанша жұмыс бағаланды.</p></div><div class="table-wrap"><table class="pro-table"><thead><tr><th>Сынып</th><th>Оқушы</th><th>Кірген</th><th>Бағаланған жұмыс</th><th>Орташа</th></tr></thead><tbody>${classRows||'<tr><td colspan="5">Дерек жоқ</td></tr>'}</tbody></table></div></div><div class="dashboard-section"><div class="section-mini-heading"><div><span class="kicker">СЫНЫП ПРОФИЛІ</span><h2>Жеті дағды бойынша орташа көрсеткіш</h2></div><p>${users.length ? `Негізгі қолдау бағыты: ${skillLabels[weak]}` : 'Оқушы қосылғаннан кейін аналитика шығады.'}</p></div>${comparisonChart(skillAverages, {}, false)}</div>`;
-  renderDemoChart();
 }
 
 function renderTeacherWorkspace() {
@@ -595,9 +593,6 @@ $('#diagnosticWorkspace').addEventListener('copy', event => { event.preventDefau
 
 async function boot() {
   updateGlobalUI(); if (state.token && state.user) { try { if (state.user.role === 'student') { await syncStudentData(); state.workspace = await api('studentWorkspace'); } else if (state.user.role === 'teacher') { state.teacherData = await api('teacherDashboard'); state.teacherWorkspace = await api('teacherWorkspace'); } } catch { await clearSession(false); } }
-  $('#authorName').textContent = CONFIG.authorName || 'Информатика пәні мұғалімі'; renderDemoChart(); go(location.hash.slice(1) || 'home'); if (!apiConfigured()) toast('Алдымен config.js файлына сервер сілтемесін енгізіңіз', true);
-}
-function renderDemoChart() {
-  const target = $('#demoChart'); if (!target) return; const baseline = { understanding:2, organization:2, algorithm:1, coding:2, debugging:1, explanation:1, transfer:1 }, finalScores = { understanding:3, organization:2, algorithm:3, coding:3, debugging:3, explanation:2, transfer:1 }; target.innerHTML = comparisonChart(baseline, finalScores, true);
+  $('#authorName').textContent = CONFIG.authorName || 'Информатика пәні мұғалімі'; go(location.hash.slice(1) || 'home'); if (!apiConfigured()) toast('Алдымен config.js файлына сервер сілтемесін енгізіңіз', true);
 }
 boot();
